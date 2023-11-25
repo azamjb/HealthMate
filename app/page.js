@@ -46,12 +46,25 @@ const Home = () => {
   };
 
   const drawCanvas = (pose, videoWidth, videoHeight) => {
-    const ctx = canvasRef.current.getContext('2d');
-    canvasRef.current.width = videoWidth;
-    canvasRef.current.height = videoHeight;
+    const canvas = canvasRef.current;
 
-    drawKeypoints(pose['keypoints'], 0.5, ctx);
-    drawSkeleton(pose['keypoints'], 0.5, ctx);
+    // Check if canvas reference and context are available before accessing them
+    if (canvas && canvas.getContext) {
+      const ctx = canvas.getContext('2d');
+  
+      // Check if the context is available before using it
+      if (ctx) {
+        canvas.width = videoWidth;
+        canvas.height = videoHeight;
+  
+        drawKeypoints(pose['keypoints'], 0.5, ctx);
+        drawSkeleton(pose['keypoints'], 0.5, ctx);
+      } else {
+        console.error('Canvas context not available.');
+      }
+    } else {
+      console.error('Canvas reference not available.');
+    }
   };
 
   useEffect(() => {
@@ -94,38 +107,44 @@ const Home = () => {
           Button 4
         </button>
       </div>
-      <div className="App">
-        <header className="App-header">
-          <Webcam
-            ref={webcamRef}
-            style={{
-              position: 'absolute',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              left: 0,
-              right: 0,
-              textAlign: 'center',
-              zIndex: 9,
-              width: 640,
-              height: 480,
-            }}
-          />
-          <canvas
-            ref={canvasRef}
-            style={{
-              position: 'absolute',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              left: 0,
-              right: 0,
-              textAlign: 'center',
-              zIndex: 9,
-              width: 640,
-              height: 480,
-            }}
-          />
-        </header>
-      </div>
+      {isClicked ? (
+        <div className="App">
+          <header className="App-header">
+            <Webcam
+              ref={webcamRef}
+              style={{
+                position: 'absolute',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                left: 0,
+                right: 0,
+                textAlign: 'center',
+                zIndex: 9,
+                width: 640,
+                height: 480,
+              }}
+            />
+            <canvas
+              ref={canvasRef}
+              style={{
+                position: 'absolute',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                left: 0,
+                right: 0,
+                textAlign: 'center',
+                zIndex: 9,
+                width: 640,
+                height: 480,
+              }}
+            />
+          </header>
+        </div>
+      ) : (
+        <div>
+          dwad
+        </div>
+      )}
     </div>
   );
 };
