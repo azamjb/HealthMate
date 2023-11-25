@@ -46,13 +46,40 @@ function isFacingCamera(facialLandmarks) {
 
 const Home = () => {
   const [isClicked, setIsClicked] = useState(false);
+  const [timeInput, setTimeInput] = useState('');
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(false)
+
   const videoRef = useRef(null);
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
 
+//Toggle camera on/off
   const handleClick = () => {
     setIsClicked(!isClicked);
   };
+
+//Start timer
+  const handleTimerClick = ()=>{
+    if (timeInput !== ''){
+      setTimeLeft(parseInt(timeInput))
+      setTimerRunning(true)
+    }
+  }
+//Countdown 
+  useEffect(() => {
+    if (timerRunning && timeLeft > 0) {
+      const countdown = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000);
+
+      return () => clearInterval(countdown);
+    } else if (timeLeft === 0) {
+      
+      alert('Time to get up!');
+      setTimerRunning(false);
+    } 
+  }, [timerRunning, timeLeft]);
 
   const runPosenet = async () => {
     const net = await posenet.load({
@@ -126,8 +153,9 @@ const Home = () => {
 
   return (
     <div className='p-4 h-screen bg-zinc-900 flex'>
-
       <div className='flex flex-col ml-auto space-y-4'>
+
+        {/*off button*/}
         <button
           className={`my-2 px-4 py-2 bg-blue-500 text-white rounded-md ${isClicked ? 'bg-red-700' : 'bg-green-500'
             }`}
@@ -135,8 +163,17 @@ const Home = () => {
         >
           {isClicked ? 'Off' : 'On'}
         </button>
-        <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
-          Button 2
+
+        {/*timer*/}
+        <input
+          type="number"
+          placeholder="Enter time in seconds"
+          value={timeInput}
+          onChange={(e) => setTimeInput(e.target.value)}
+          className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'
+        />
+        <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md' onClick={handleTimerClick}>
+          Start Timer
         </button>
         <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
           Button 3
@@ -148,15 +185,13 @@ const Home = () => {
       {isClicked ? (
         <div className="App">
           <header className="App-header">
-            <Webcam
+          <Webcam
               ref={webcamRef}
               style={{
                 position: 'absolute',
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                left: 0,
-                right: 0,
-                textAlign: 'center',
+                left: 40, // Align to the left
+                top: '50%', // Center vertically
+                transform: 'translateY(-50%)', // Center vertically
                 zIndex: 9,
                 width: 640,
                 height: 480,
@@ -166,11 +201,9 @@ const Home = () => {
               ref={canvasRef}
               style={{
                 position: 'absolute',
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                left: 0,
-                right: 0,
-                textAlign: 'center',
+                left: 40, // Align to the left
+                top: '50%', // Center vertically
+                transform: 'translateY(-50%)', // Center vertically
                 zIndex: 9,
                 width: 640,
                 height: 480,
@@ -183,6 +216,11 @@ const Home = () => {
         
         </div>
       )}
+      <div className='mt-auto'>
+        <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
+          {timerRunning ? `Time left: ${timeLeft} seconds` : ''}
+        </div>
+      </div>
     </div>
   );
 };
