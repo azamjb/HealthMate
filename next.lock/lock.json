@@ -1,0 +1,4 @@
+{
+  "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0": { "integrity": "sha512-UGpYRFK6m3Lleiq8utoAx8Vf7tUtQSQevDETnV3YXU1P2/26o3b3RHUZ03aX5jEM4NY3lk5pzCwDXDBBQVirLQ==", "contentType": "application/javascript; charset=utf-8" },
+  "version": 1
+}
