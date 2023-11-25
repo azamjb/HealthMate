@@ -41,13 +41,13 @@ export default function Home() {
         >
           {isClicked ? 'Off' : 'On'}
         </button>
-        <button className='my-2 px-4 py-2 bg-green-500 text-white rounded-md'>
+        <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
           Button 2
         </button>
-        <button className='my-2 px-4 py-2 bg-yellow-500 text-white rounded-md'>
+        <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
           Button 3
         </button>
-        <button className='my-2 px-4 py-2 bg-red-500 text-white rounded-md'>
+        <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
           Button 4
         </button>
       </div>
