@@ -10,6 +10,21 @@ import Webcam from 'react-webcam';
 // For example: { part: 'leftEye', position: { x: 100, y: 200 } }
 
 
+function isSittingDown(facialLandmarks) {
+  
+  const leftEye = facialLandmarks.find(landmark => landmark.part === 'leftEye');
+  //0.6 is max for nose
+  //0.15 for eye, its more unique
+  if (leftEye.score < 0.15) {
+    // console.log(" ")
+    // console.log("Score: " +  nose.score)
+    return false;
+  } else {
+    // console.log(" ")
+    // console.log("Score: " +  nose.score)
+    return true;
+  }
+}
 
 function isFacingCamera(facialLandmarks) {
   const rightEye = facialLandmarks.find(landmark => landmark.part === 'rightEye');
@@ -106,7 +121,8 @@ const Home = () => {
 
       const pose = await net.estimateSinglePose(video);
       // console.log(pose);
-      console.log(isFacingCamera(pose.keypoints));
+      //console.log(isFacingCamera(pose.keypoints));
+      console.log(isSittingDown(pose.keypoints));
       drawCanvas(pose, videoWidth, videoHeight);
     }
   };
