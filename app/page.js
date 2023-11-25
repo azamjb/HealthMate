@@ -48,16 +48,21 @@ function isFacingCamera(facialLandmarks) {
   // Define a threshold for how much horizontal and vertical offset is allowed
   // These thresholds can be fine-tuned for sensitivity
   const horizontalOffsetThreshold = eyeDistanceHorizontal * 0.8;
-  const verticalOffsetThreshold = eyeDistanceHorizontal; // Allowing more vertical leeway
+  const verticalOffsetThreshold = eyeDistanceHorizontal*0.4; // Allowing more vertical leeway
 
   // Check if the person is facing the camera based on the nose position
-  // The person can be looking up or down but still be considered facing forward
-  const isFacingForward = noseHorizontalOffset < horizontalOffsetThreshold && noseVerticalOffset < verticalOffsetThreshold;
-
+  // The person can be looking up or down but still be considered facing forward && noseVerticalOffset < verticalOffsetThreshold;
+  const isFacingForward = noseHorizontalOffset < horizontalOffsetThreshold;
   return isFacingForward;
+  // console.log({horizontal:noseHorizontalOffset < horizontalOffsetThreshold, vertical:noseVerticalOffset < verticalOffsetThreshold})
+  // return {horizontal:noseHorizontalOffset < horizontalOffsetThreshold, vertical:noseVerticalOffset < verticalOffsetThreshold};
 }
 
-
+// useEffect(()=>{
+  fetch('/api/hello')
+  .then((response) => response.json())
+  .then((data) => console.log(data));
+// },[])
 
 const Home = () => {
   const [isClicked, setIsClicked] = useState(false);
@@ -103,7 +108,7 @@ const Home = () => {
     });
     setInterval(() => {
       detect(net);
-    }, 100);
+    }, 500);
   };
 
   const detect = async (net) => {
