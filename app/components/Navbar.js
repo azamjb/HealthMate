@@ -11,7 +11,7 @@ const Navbar = () => {
                         alt=""
                         className="h-10 w-10 ml-6 mr-3"
                     />
-                    <h1 className='font-bold text-2xl text-black'>Study Smart</h1>
+                    <h1 className='font-bold text-2xl text-black'>Health Mate</h1>
                 </div>
             </Link>
 

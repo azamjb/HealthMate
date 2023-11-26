@@ -5,7 +5,7 @@ import * as tf from '@tensorflow/tfjs'
 import { drawKeypoints, drawSkeleton } from './utilities';
 import Webcam from 'react-webcam';
 import RobotImage from './components/RobotImage';
-import { Head } from 'next/document';
+import Head from 'next/head';
 // import './style.css';
 
 // Custom functions
@@ -96,7 +96,7 @@ const Home = () => {
   const [timerRunningBreak, setTimerRunningBreak] = useState(false)
   const [timeInputBreak, setTimeInputBreak] = useState('')
 
-  const [textForBot, setTextForBot] = useState("Hello! I am Study Smart!")
+  const [textForBot, setTextForBot] = useState("Hello! I am  Health Mate!")
   const [landmarks, setLandMarks] = useState([]);
   const [capture, setCapture] = useState(null);
   const [isFacing, setIsFacing] = useState(false);
@@ -314,12 +314,12 @@ const Home = () => {
 
 
   return (
-    <div>
-      {/* <Head>
+    <>
+      <Head>
         <title>
-          Study Smart
+          Health Mate
         </title>
-      </Head> */}
+      </Head>
       <div className='p-4 h-screen bg-white flex'>
         <div className='flex flex-col ml-auto space-y-4'>
           <button
@@ -410,7 +410,7 @@ const Home = () => {
         )}
         <RobotImage typedText={textForBot} />
       </div>
-    </div>
+    </>
   );
 }
 
