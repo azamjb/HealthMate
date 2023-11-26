@@ -5,6 +5,32 @@ import * as tf from '@tensorflow/tfjs'
 import { drawKeypoints, drawSkeleton } from './utilities';
 import Webcam from 'react-webcam';
 import RobotImage from './components/RobotImage';
+
+// Custom functions
+function saveMinDist(facialLandmarks) {
+  
+  const leftEye = facialLandmarks.find(landmark => landmark.part === 'leftEye');
+  const rightEye = facialLandmarks.find(landmark => landmark.part === 'rightEye');
+  const minDist = Math.abs(rightEye.position.x - leftEye.position.x);
+
+  //returns minimum distance
+  return minDist;
+}
+
+// to check if user is currently closer than minDist
+function distanceToScreen(minDist, facialLandmarks) {
+  
+  const leftEye = facialLandmarks.find(landmark => landmark.part === 'leftEye');
+  const rightEye = facialLandmarks.find(landmark => landmark.part === 'rightEye');
+  const currentDist = Math.abs(rightEye.position.x - leftEye.position.x);
+
+  if (currentDist <= minDist) {
+    return true
+  } else {
+    return false
+  }
+}
+
 function isSittingDown(facialLandmarks) {
   
   const leftEye = facialLandmarks.find(landmark => landmark.part === 'leftEye');
