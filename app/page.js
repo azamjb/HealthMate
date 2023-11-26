@@ -89,10 +89,15 @@ const Home = () => {
   const [timeInput, setTimeInput] = useState('');
   const [timeLeft, setTimeLeft] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false)
+  const [timeLeftBreak, setTimeLeftBreak] = useState(0)
+  const [timerRunningBreak, setTimerRunningBreak] = useState(false)
+  const [timeInputBreak, setTimeInputBreak] = useState('')
+  const [textForBot, setTextForBot] = useState('hello I am ErgoBot')
 
   const videoRef = useRef(null);
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+  
 
 //Toggle camera on/off
   const handleClick = () => {
@@ -108,46 +113,55 @@ const Home = () => {
     }
     if (timeInputBreak !== '' && timeLeft === 0 && !timerRunningBreak && !isClicked) {
       setTimeLeftBreak(parseInt(timeInputBreak));
-      setTimerRunningBreak(true);
+      setTimerRunningBreak(false);
     }
   };
 
+  // Countdown for work timer
   useEffect(() => {
     let workCountdown;
-    let breakCountdown;
 
-    if (timerRunning && timeLeft > 0 && timerStarted) {
+    if (timerRunning && timeLeft > 0 ) {
       workCountdown = setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1);
       }, 1000);
-    } else if (timeLeft === 0 && timerRunning && timerStarted) {
+
+      return () => clearInterval(workCountdown);
+    } else if (timeLeft === 0 && timerRunning) {
       alert('Time for a break!');
-      setTimerStarted(false);
+      setIsClicked(false);
       setTimerRunning(false);
 
+      // Start the break timer after work time ends
       setTimeLeftBreak(parseInt(timeInputBreak));
       setTimerRunningBreak(true);
     }
 
-    if (timerRunningBreak && timeLeftBreak > 0 && !timerStarted) {
+    return () => clearInterval(workCountdown);
+  }, [timerRunning, timeLeft]);
+
+  // Countdown for break timer
+  useEffect(() => {
+    let breakCountdown;
+
+    if (timerRunningBreak && timeLeftBreak > 0) {
       breakCountdown = setInterval(() => {
         setTimeLeftBreak((prevTime) => prevTime - 1);
       }, 1000);
-    } else if (timeLeftBreak === 0 && timerRunningBreak && !timerStarted) {
+
+      return () => clearInterval(breakCountdown);
+    } else if (timeLeftBreak === 0 && timerRunningBreak) {
       alert('Time to work again!');
-      setTimerStarted(true);
       setTimerRunningBreak(false);
 
+      // Start the work timer after break time ends
       setTimeLeft(parseInt(timeInput));
       setTimerRunning(false);
-      setIsClicked(false)
     }
 
-    return () => {
-      clearInterval(workCountdown);
-      clearInterval(breakCountdown);
-    };
-  }, [timerRunning, timeLeft, timerStarted, timeLeftBreak, timerRunningBreak, timeInput, timeInputBreak]);
+    return () => clearInterval(breakCountdown);
+  }, [timerRunningBreak, timeLeftBreak]);
+
 
   const runPosenet = async () => {
     const net = await posenet.load({
@@ -256,7 +270,7 @@ const Home = () => {
         </div>
       ) : (
         <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
-          {timeLeft === 0 ?( 'Set your work time') : "Set your break time"}
+          {timeLeft === 0 ?( 'Set your work time') : "Set your work time"}
         </div>
       )}
       </div>
@@ -274,7 +288,7 @@ const Home = () => {
           </div>
         ) : (
           <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
-            {timeLeftBreak === 0 ? 'Set your break time' : ''}
+            {timeLeftBreak === 0 ? 'Set your break time' : 'Set Your Break time'}
           </div>
         )}
       </div>
