@@ -77,15 +77,12 @@ const Home = () => {
 //Toggle camera on/off
   const handleClick = () => {
     setIsClicked(!isClicked);
-  };
-
-//Start timer
-  const handleTimerClick = ()=>{
     if (timeInput !== ''){
       setTimeLeft(parseInt(timeInput))
       setTimerRunning(true)
     }
-  }
+  };
+
 //Countdown 
   useEffect(() => {
     let countdown;
@@ -205,9 +202,6 @@ const Home = () => {
           onChange={(e) => setTimeInput(e.target.value)}
           className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'
         />
-        <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md' onClick={handleTimerClick}>
-          Start Timer
-        </button>
         <div className='mt-auto'>
       {timerRunning ? (
         <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
