@@ -97,9 +97,26 @@ const Home = () => {
   const [textForBot, setTextForBot] = useState("Hello! I am ErgoBot!")
   const [landmarks, setLandMarks] = useState([]);
   const [capture, setCapture] = useState(null);
+  const [isFacing, setIsFacing] = useState(false);
   const videoRef = useRef(null);
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+
+  const [count, setCount] = useState(2000)
+
+  // Your startScreenTimer function
+  function startScreenTimer(facialLandmarks) {
+    // If user is facing away, do the countdown
+    if (isFacingCamera(facialLandmarks)) {
+      // Update the count using setCount
+      let newCount = count - 1
+      setCount(newCount);
+      //setCount(count = count - 1);
+      console.log("I SEE YOU FACING CAMERA")
+      console.log(count)
+    }
+  
+  }
 
   async function handleSendSMS() {
     try {
@@ -122,6 +139,7 @@ const Home = () => {
       alert('Failed to send SMS.');
     }
   }
+
 
 
   //Toggle camera on/off
@@ -159,7 +177,11 @@ useEffect(() => {
 
   if (timerRunning && timeLeft > 0) {
     workCountdown = setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1);
+      console.log(isFacing)
+      if(isFacing){
+        // console.log(isFacingCamera(landmarks))
+        setTimeLeft((prevTime) => prevTime - 1);
+      }
     }, 1000);
 
     return () => clearInterval(workCountdown);
@@ -174,7 +196,7 @@ useEffect(() => {
   }
 
   return () => clearInterval(workCountdown);
-}, [timerRunning, timeLeft]);
+}, [timerRunning, timeLeft, isFacing]);
 
 // Countdown for break timer
 useEffect(() => {
@@ -198,7 +220,6 @@ useEffect(() => {
 
   return () => clearInterval(breakCountdown);
 }, [timerRunningBreak, timeLeftBreak]);
-
 
 const runPosenet = async () => {
   const net = await posenet.load({
@@ -277,8 +298,11 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
+  console.log(landmarks[0])
   if (landmarks[0]) {
-    console.log(distanceToScreen(capture, landmarks));
+    // console.log(distanceToScreen(capture, landmarks));
+    setIsFacing(isFacingCamera(landmarks));
+    console.log(isFacingCamera(landmarks))
     if (distanceToScreen(capture, landmarks))
       setTextForBot("You Are Doing Well!")
     else
