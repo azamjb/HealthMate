@@ -4,24 +4,15 @@ import * as posenet from '@tensorflow-models/posenet';
 import * as tf from '@tensorflow/tfjs'
 import { drawKeypoints, drawSkeleton } from './utilities';
 import Webcam from 'react-webcam';
-
-// Assuming keypoints is an array of objects like the one in the image
-// with properties 'part', 'position.x', and 'position.y'
-// For example: { part: 'leftEye', position: { x: 100, y: 200 } }
-
-
+import RobotImage from './components/RobotImage';
 function isSittingDown(facialLandmarks) {
   
   const leftEye = facialLandmarks.find(landmark => landmark.part === 'leftEye');
   //0.6 is max for nose
   //0.15 for eye, its more unique
   if (leftEye.score < 0.15) {
-    // console.log(" ")
-    // console.log("Score: " +  nose.score)
     return false;
   } else {
-    // console.log(" ")
-    // console.log("Score: " +  nose.score)
     return true;
   }
 }
@@ -59,16 +50,17 @@ function isFacingCamera(facialLandmarks) {
 }
 
 // useEffect(()=>{
-  fetch('/api/hello')
-  .then((response) => response.json())
-  .then((data) => console.log(data));
-// },[])
+//   fetch('/api/hello')
+//   .then((response) => response.json())
+//   .then((data) => console.log(data));
+// // },[])
 
 const Home = () => {
   const [isClicked, setIsClicked] = useState(false);
   const [timeInput, setTimeInput] = useState('');
   const [timeLeft, setTimeLeft] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false)
+  const [textForBot, setTextForBot] = useState("Hello! I am ErgoBot!")
 
   const videoRef = useRef(null);
   const webcamRef = useRef(null);
@@ -260,7 +252,7 @@ const Home = () => {
         
         </div>
       )}
-      
+      <RobotImage typedText={textForBot}/>
     </div>
   );
 };
