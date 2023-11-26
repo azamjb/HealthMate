@@ -2,7 +2,7 @@ import React from 'react';
 
 const Page = () => {
   // Define RGB color variables
-  const background = '#fff6d0'; // cream
+  const background ='white'; // cream
   const backgroundtwo = '#faeb96'; // cream
   const textColor = '#583e1d';
   const accentColor = '#c39b3e';
