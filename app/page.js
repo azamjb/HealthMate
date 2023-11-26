@@ -13,11 +13,13 @@ import Webcam from 'react-webcam';
 function isSittingDown(facialLandmarks) {
   
   const leftEye = facialLandmarks.find(landmark => landmark.part === 'leftEye');
+  
   //0.6 is max for nose
   //0.15 for eye, its more unique
   if (leftEye.score < 0.15) {
     // console.log(" ")
     // console.log("Score: " +  nose.score)
+
     return false;
   } else {
     // console.log(" ")
@@ -69,6 +71,11 @@ const Home = () => {
   const [timeInput, setTimeInput] = useState('');
   const [timeLeft, setTimeLeft] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false)
+  const [timeInputBreak, setTimeInputBreak] = useState('');
+  const [timeLeftBreak, setTimeLeftBreak] = useState(0);
+  const [timerRunningBreak, setTimerRunningBreak] = useState(false)
+  const [timerStarted, setTimerStarted] = useState(true)
+
 
   const videoRef = useRef(null);
   const webcamRef = useRef(null);
@@ -76,32 +83,58 @@ const Home = () => {
 
 //Toggle camera on/off
   const handleClick = () => {
-    setIsClicked(!isClicked);
+    if (timeInput == ''){
+      alert('Input your work time')
+    }
+    else{
+      setIsClicked(!isClicked);
+    }
     if (timeInput !== ''){
       setTimeLeft(parseInt(timeInput))
       setTimerRunning(true)
     }
+    if (timeInputBreak !== '' && timeLeft === 0 && !timerRunningBreak && !isClicked) {
+      setTimeLeftBreak(parseInt(timeInputBreak));
+      setTimerRunningBreak(true);
+    }
   };
 
-//Countdown 
   useEffect(() => {
-    let countdown;
+    let workCountdown;
+    let breakCountdown;
 
-    if (timerRunning && timeLeft > 0) {
-      const countdown = setInterval(() => {
+    if (timerRunning && timeLeft > 0 && timerStarted) {
+      workCountdown = setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1);
       }, 1000);
-
-      return () => clearInterval(countdown);
-    } else if (timeLeft === 0 && timerRunning) {
-      
-      alert('Time to get up!');
+    } else if (timeLeft === 0 && timerRunning && timerStarted) {
+      alert('Time for a break!');
+      setTimerStarted(false);
       setTimerRunning(false);
-    } 
-    return ()=>{
-      clearInterval(countdown)
+
+      setTimeLeftBreak(parseInt(timeInputBreak));
+      setTimerRunningBreak(true);
     }
-  }, [timerRunning, timeLeft]);
+
+    if (timerRunningBreak && timeLeftBreak > 0 && !timerStarted) {
+      breakCountdown = setInterval(() => {
+        setTimeLeftBreak((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (timeLeftBreak === 0 && timerRunningBreak && !timerStarted) {
+      alert('Time to work again!');
+      setTimerStarted(true);
+      setTimerRunningBreak(false);
+
+      setTimeLeft(parseInt(timeInput));
+      setTimerRunning(false);
+      setIsClicked(false)
+    }
+
+    return () => {
+      clearInterval(workCountdown);
+      clearInterval(breakCountdown);
+    };
+  }, [timerRunning, timeLeft, timerStarted, timeLeftBreak, timerRunningBreak, timeInput, timeInputBreak]);
 
   const runPosenet = async () => {
     const net = await posenet.load({
@@ -112,6 +145,7 @@ const Home = () => {
       detect(net);
     }, 500);
   };
+  
 
   const detect = async (net) => {
     if (
@@ -209,16 +243,28 @@ const Home = () => {
         </div>
       ) : (
         <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
-          {timeLeft === 0 ? 'Time to Stand up!' : ''}
+          {timeLeft === 0 ?( 'Set your work time') : "Set your break time"}
         </div>
       )}
       </div>
-        <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
-          Button 3
-        </button>
-        <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
-          Button 4
-        </button>
+        <input
+          type="number"
+          placeholder="Enter time in seconds"
+          value={timeInputBreak}
+          onChange={(e) => setTimeInputBreak(e.target.value)}
+          className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'
+        />
+        <div className='mt-auto'>
+        {timerRunningBreak ? (
+          <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
+            Time left: {timeLeftBreak} seconds
+          </div>
+        ) : (
+          <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
+            {timeLeftBreak === 0 ? 'Set your break time' : ''}
+          </div>
+        )}
+      </div>
       </div>
       {isClicked ? (
         <div className="App">
