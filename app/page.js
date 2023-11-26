@@ -8,7 +8,7 @@ import RobotImage from './components/RobotImage';
 
 // Custom functions
 function saveMinDist(facialLandmarks) {
-  
+  // console.log(facialLandmarks)
   const leftEye = facialLandmarks.find(landmark => landmark.part === 'leftEye');
   const rightEye = facialLandmarks.find(landmark => landmark.part === 'rightEye');
   const minDist = Math.abs(rightEye.position.x - leftEye.position.x);
@@ -87,7 +87,8 @@ const Home = () => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false)
   const [textForBot, setTextForBot] = useState("Hello! I am ErgoBot!")
-
+  const [landmarks, setLandMarks] = useState([]);
+  const [capture, setCapture] = useState(null);
   const videoRef = useRef(null);
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
@@ -104,6 +105,13 @@ const Home = () => {
       setTimerRunning(true)
     }
   }
+
+  const handleCapture=()=>{
+    // console.log("functionCalled")
+    setCapture(saveMinDist(landmarks));
+    // console.log(capture);
+  }
+
 //Countdown 
   useEffect(() => {
     let countdown;
@@ -131,7 +139,7 @@ const Home = () => {
     });
     setInterval(() => {
       detect(net);
-    }, 500);
+    }, 500);//Set here
   };
 
   const detect = async (net) => {
@@ -148,9 +156,13 @@ const Home = () => {
       webcamRef.current.video.height = videoHeight;
 
       const pose = await net.estimateSinglePose(video);
+      setLandMarks(pose.keypoints? pose.keypoints:[]);
       // console.log(pose);
       //console.log(isFacingCamera(pose.keypoints));
-      console.log(isSittingDown(pose.keypoints));
+      // console.log(isSittingDown(pose.keypoints));
+      // console.log(capture);
+      // if(captuer)
+      //   console.log(distanceToScreen(captuer, landmarks))
       drawCanvas(pose, videoWidth, videoHeight);
     }
   };
@@ -195,6 +207,15 @@ const Home = () => {
     runPosenet();
   }, []);
 
+  useEffect(()=>{
+    if(landmarks[0]){
+      console.log(distanceToScreen(capture, landmarks));
+      if(distanceToScreen(capture, landmarks))
+        setTextForBot("You Are Doing Well!")
+      else
+        setTextForBot("Don't Go Too Close");
+    }
+  }, [landmarks])
   return (
     <div className='p-4 h-screen bg-zinc-900 flex'>
       <div className=''>
@@ -215,6 +236,7 @@ const Home = () => {
           {isClicked ? 'Off' : 'On'}
         </button>
 
+
         {/*timer*/}
         <input
           type="number"
@@ -223,6 +245,7 @@ const Home = () => {
           onChange={(e) => setTimeInput(e.target.value)}
           className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'
         />
+        <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md' onClick={handleCapture}>Capture</button>
         <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md' onClick={handleTimerClick}>
           Start Timer
         </button>
