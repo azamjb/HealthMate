@@ -4,11 +4,32 @@ import * as posenet from '@tensorflow-models/posenet';
 import * as tf from '@tensorflow/tfjs'
 import { drawKeypoints, drawSkeleton } from './utilities';
 import Webcam from 'react-webcam';
+import RobotImage from './components/RobotImage';
 
-// Assuming keypoints is an array of objects like the one in the image
-// with properties 'part', 'position.x', and 'position.y'
-// For example: { part: 'leftEye', position: { x: 100, y: 200 } }
+// Custom functions
+function saveMinDist(facialLandmarks) {
+  
+  const leftEye = facialLandmarks.find(landmark => landmark.part === 'leftEye');
+  const rightEye = facialLandmarks.find(landmark => landmark.part === 'rightEye');
+  const minDist = Math.abs(rightEye.position.x - leftEye.position.x);
 
+  //returns minimum distance
+  return minDist;
+}
+
+// to check if user is currently closer than minDist
+function distanceToScreen(minDist, facialLandmarks) {
+  
+  const leftEye = facialLandmarks.find(landmark => landmark.part === 'leftEye');
+  const rightEye = facialLandmarks.find(landmark => landmark.part === 'rightEye');
+  const currentDist = Math.abs(rightEye.position.x - leftEye.position.x);
+
+  if (currentDist <= minDist) {
+    return true
+  } else {
+    return false
+  }
+}
 
 function isSittingDown(facialLandmarks) {
   
@@ -19,11 +40,8 @@ function isSittingDown(facialLandmarks) {
   if (leftEye.score < 0.15) {
     // console.log(" ")
     // console.log("Score: " +  nose.score)
-
     return false;
   } else {
-    // console.log(" ")
-    // console.log("Score: " +  nose.score)
     return true;
   }
 }
@@ -61,21 +79,16 @@ function isFacingCamera(facialLandmarks) {
 }
 
 // useEffect(()=>{
-  fetch('/api/hello')
-  .then((response) => response.json())
-  .then((data) => console.log(data));
-// },[])
+//   fetch('/api/hello')
+//   .then((response) => response.json())
+//   .then((data) => console.log(data));
+// // },[])
 
 const Home = () => {
   const [isClicked, setIsClicked] = useState(false);
   const [timeInput, setTimeInput] = useState('');
   const [timeLeft, setTimeLeft] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false)
-  const [timeInputBreak, setTimeInputBreak] = useState('');
-  const [timeLeftBreak, setTimeLeftBreak] = useState(0);
-  const [timerRunningBreak, setTimerRunningBreak] = useState(false)
-  const [timerStarted, setTimerStarted] = useState(true)
-
 
   const videoRef = useRef(null);
   const webcamRef = useRef(null);
@@ -300,7 +313,7 @@ const Home = () => {
         
         </div>
       )}
-      
+      <RobotImage typedText={textForBot}/>
     </div>
   );
 };
