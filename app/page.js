@@ -83,17 +83,22 @@ const Home = () => {
   }
 //Countdown 
   useEffect(() => {
+    let countdown;
+
     if (timerRunning && timeLeft > 0) {
       const countdown = setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1);
       }, 1000);
 
       return () => clearInterval(countdown);
-    } else if (timeLeft === 0) {
+    } else if (timeLeft === 0 && timerRunning) {
       
       alert('Time to get up!');
       setTimerRunning(false);
     } 
+    return ()=>{
+      clearInterval(countdown)
+    }
   }, [timerRunning, timeLeft]);
 
   const runPosenet = async () => {
@@ -169,8 +174,15 @@ const Home = () => {
 
   return (
     <div className='p-4 h-screen bg-zinc-900 flex'>
+      <div className=''>
+        <p className='ml-40 border mb-4 bg-yellow-700 p-4'>
+          Step 1: Set your work time and break time
+        </p>
+        <p className='ml-40 border mb-4 bg-yellow-700 p-4'>
+          Step 2: Turn on your camera to begin your work session
+        </p>
+      </div>
       <div className='flex flex-col ml-auto space-y-4'>
-
         {/*off button*/}
         <button
           className={`my-2 px-4 py-2 bg-blue-500 text-white rounded-md ${isClicked ? 'bg-red-700' : 'bg-green-500'
@@ -191,6 +203,17 @@ const Home = () => {
         <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md' onClick={handleTimerClick}>
           Start Timer
         </button>
+        <div className='mt-auto'>
+      {timerRunning ? (
+        <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
+          Time left: {timeLeft} seconds
+        </div>
+      ) : (
+        <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
+          {timeLeft === 0 ? 'Time to Stand up!' : ''}
+        </div>
+      )}
+      </div>
         <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
           Button 3
         </button>
@@ -205,8 +228,8 @@ const Home = () => {
               ref={webcamRef}
               style={{
                 position: 'absolute',
-                left: 40, // Align to the left
-                top: '50%', // Center vertically
+                left: 80, // Align to the left
+                top: '65%', // Center vertically
                 transform: 'translateY(-50%)', // Center vertically
                 zIndex: 9,
                 width: 640,
@@ -217,8 +240,8 @@ const Home = () => {
               ref={canvasRef}
               style={{
                 position: 'absolute',
-                left: 40, // Align to the left
-                top: '50%', // Center vertically
+                left: 80, // Align to the left
+                top: '65%', // Center vertically
                 transform: 'translateY(-50%)', // Center vertically
                 zIndex: 9,
                 width: 640,
@@ -232,11 +255,7 @@ const Home = () => {
         
         </div>
       )}
-      <div className='mt-auto'>
-        <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
-          {timerRunning ? `Time left: ${timeLeft} seconds` : ''}
-        </div>
-      </div>
+      
     </div>
   );
 };
