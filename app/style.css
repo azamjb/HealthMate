@@ -1,0 +1,75 @@
+/* General Page Styles */
+
+body {
+
+    background-color: #fff6d0; 
+}
+.p-4 {
+    padding: 16px;
+  }
+  
+  .h-screen {
+    height: 100vh;
+  }
+  
+  .bg-zinc-900 {
+    background-color: #fff6d0;
+  }
+  
+  /* Text and Button Styles */
+  .border {
+    border: 1px solid #ddd;
+  }
+  
+  .bg-yellow-700 {
+    background-color: #b7791f;
+  }
+  
+  .text-white {
+    color: white;
+  }
+  
+  .rounded-md {
+    border-radius: 6px;
+  }
+  
+  /* Button Specific Styles */
+  .bg-blue-500 {
+    background-color: #4299e1;
+  }
+  
+  .bg-red-700 {
+    background-color: #c53030;
+  }
+  
+  .bg-green-500 {
+    background-color: #48bb78;
+  }
+  
+  .bg-yellow-600 {
+    background-color: #d69e2e;
+  }
+  
+  .my-2 {
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .px-4 {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  .py-2 {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  
+  /* Webcam and Canvas Styles */
+  .App-header {
+    position: relative;
+    text-align: center;
+  }
+  
+  /* Add additional custom styles as needed */
+  

@@ -5,6 +5,7 @@ import * as tf from '@tensorflow/tfjs'
 import { drawKeypoints, drawSkeleton } from './utilities';
 import Webcam from 'react-webcam';
 import RobotImage from './components/RobotImage';
+import './style.css';
 
 // Custom functions
 function saveMinDist(facialLandmarks) {
