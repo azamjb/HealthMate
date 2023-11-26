@@ -8,7 +8,7 @@ import RobotImage from './components/RobotImage';
 
 // Custom functions
 function saveMinDist(facialLandmarks) {
-  
+  // console.log(facialLandmarks)
   const leftEye = facialLandmarks.find(landmark => landmark.part === 'leftEye');
   const rightEye = facialLandmarks.find(landmark => landmark.part === 'rightEye');
   const minDist = Math.abs(rightEye.position.x - leftEye.position.x);
@@ -19,7 +19,7 @@ function saveMinDist(facialLandmarks) {
 
 // to check if user is currently closer than minDist
 function distanceToScreen(minDist, facialLandmarks) {
-  
+
   const leftEye = facialLandmarks.find(landmark => landmark.part === 'leftEye');
   const rightEye = facialLandmarks.find(landmark => landmark.part === 'rightEye');
   const currentDist = Math.abs(rightEye.position.x - leftEye.position.x);
@@ -32,9 +32,9 @@ function distanceToScreen(minDist, facialLandmarks) {
 }
 
 function isSittingDown(facialLandmarks) {
-  
+
   const leftEye = facialLandmarks.find(landmark => landmark.part === 'leftEye');
-  
+
   //0.6 is max for nose
   //0.15 for eye, its more unique
   if (leftEye.score < 0.15) {
@@ -68,7 +68,7 @@ function isFacingCamera(facialLandmarks) {
   // Define a threshold for how much horizontal and vertical offset is allowed
   // These thresholds can be fine-tuned for sensitivity
   const horizontalOffsetThreshold = eyeDistanceHorizontal * 0.8;
-  const verticalOffsetThreshold = eyeDistanceHorizontal*0.4; // Allowing more vertical leeway
+  const verticalOffsetThreshold = eyeDistanceHorizontal * 0.4; // Allowing more vertical leeway
 
   // Check if the person is facing the camera based on the nose position
   // The person can be looking up or down but still be considered facing forward && noseVerticalOffset < verticalOffsetThreshold;
@@ -92,22 +92,24 @@ const Home = () => {
   const [timeLeftBreak, setTimeLeftBreak] = useState(0)
   const [timerRunningBreak, setTimerRunningBreak] = useState(false)
   const [timeInputBreak, setTimeInputBreak] = useState('')
-  const [textForBot, setTextForBot] = useState('hello I am ErgoBot')
 
+  const [textForBot, setTextForBot] = useState("Hello! I am ErgoBot!")
+  const [landmarks, setLandMarks] = useState([]);
+  const [capture, setCapture] = useState(null);
   const videoRef = useRef(null);
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
-  
 
-//Toggle camera on/off
+
+  //Toggle camera on/off
   const handleClick = () => {
-    if (timeInput == ''){
+    if (timeInput == '') {
       alert('Input your work time')
     }
-    else{
+    else {
       setIsClicked(!isClicked);
     }
-    if (timeInput !== ''){
+    if (timeInput !== '') {
       setTimeLeft(parseInt(timeInput))
       setTimerRunning(true)
     }
@@ -117,171 +119,202 @@ const Home = () => {
     }
   };
 
-  // Countdown for work timer
-  useEffect(() => {
-    let workCountdown;
 
-    if (timerRunning && timeLeft > 0 ) {
-      workCountdown = setInterval(() => {
-        setTimeLeft((prevTime) => prevTime - 1);
-      }, 1000);
+const handleCapture = () => {
+  // console.log("functionCalled")
+  setCapture(saveMinDist(landmarks));
+  // console.log(capture);
+}
 
-      return () => clearInterval(workCountdown);
-    } else if (timeLeft === 0 && timerRunning) {
-      alert('Time for a break!');
-      setIsClicked(false);
-      setTimerRunning(false);
+//Countdown 
+// useEffect(() => {
+//   let countdown;
 
-      // Start the break timer after work time ends
-      setTimeLeftBreak(parseInt(timeInputBreak));
-      setTimerRunningBreak(true);
-    }
+// Countdown for work timer
+useEffect(() => {
+  let workCountdown;
+
+  if (timerRunning && timeLeft > 0) {
+    workCountdown = setInterval(() => {
+      setTimeLeft((prevTime) => prevTime - 1);
+    }, 1000);
 
     return () => clearInterval(workCountdown);
-  }, [timerRunning, timeLeft]);
+  } else if (timeLeft === 0 && timerRunning) {
+    alert('Time for a break!');
+    setIsClicked(false);
+    setTimerRunning(false);
 
-  // Countdown for break timer
-  useEffect(() => {
-    let breakCountdown;
+    // Start the break timer after work time ends
+    setTimeLeftBreak(parseInt(timeInputBreak));
+    setTimerRunningBreak(true);
+  }
 
-    if (timerRunningBreak && timeLeftBreak > 0) {
-      breakCountdown = setInterval(() => {
-        setTimeLeftBreak((prevTime) => prevTime - 1);
-      }, 1000);
+  return () => clearInterval(workCountdown);
+}, [timerRunning, timeLeft]);
 
-      return () => clearInterval(breakCountdown);
-    } else if (timeLeftBreak === 0 && timerRunningBreak) {
-      alert('Time to work again!');
-      setTimerRunningBreak(false);
+// Countdown for break timer
+useEffect(() => {
+  let breakCountdown;
 
-      // Start the work timer after break time ends
-      setTimeLeft(parseInt(timeInput));
-      setTimerRunning(false);
-    }
+  if (timerRunningBreak && timeLeftBreak > 0) {
+    breakCountdown = setInterval(() => {
+      setTimeLeftBreak((prevTime) => prevTime - 1);
+    }, 1000);
 
     return () => clearInterval(breakCountdown);
-  }, [timerRunningBreak, timeLeftBreak]);
+  } else if (timeLeftBreak === 0 && timerRunningBreak) {
+    alert('Time to work again!');
+    setTimerRunningBreak(false);
+
+    // Start the work timer after break time ends
+    setTimeLeft(parseInt(timeInput));
+    setTimerRunning(false);
+  }
+
+  return () => clearInterval(breakCountdown);
+}, [timerRunningBreak, timeLeftBreak]);
 
 
-  const runPosenet = async () => {
-    const net = await posenet.load({
-      inputResolution: { width: 640, height: 480 },
-      scale: 0.5,
-    });
-    setInterval(() => {
-      detect(net);
-    }, 500);
-  };
-  
+const runPosenet = async () => {
+  const net = await posenet.load({
+    inputResolution: { width: 640, height: 480 },
+    scale: 0.5,
+  });
+  setInterval(() => {
+    detect(net);
+  }, 500);//Set here
+};
 
-  const detect = async (net) => {
-    if (
-      typeof webcamRef.current !== 'undefined' &&
-      webcamRef.current !== null &&
-      webcamRef.current.video.readyState === 4
-    ) {
-      const video = webcamRef.current.video;
-      const videoWidth = webcamRef.current.video.videoWidth;
-      const videoHeight = webcamRef.current.video.videoHeight;
 
-      webcamRef.current.video.width = videoWidth;
-      webcamRef.current.video.height = videoHeight;
+const detect = async (net) => {
+  if (
+    typeof webcamRef.current !== 'undefined' &&
+    webcamRef.current !== null &&
+    webcamRef.current.video.readyState === 4
+  ) {
+    const video = webcamRef.current.video;
+    const videoWidth = webcamRef.current.video.videoWidth;
+    const videoHeight = webcamRef.current.video.videoHeight;
 
-      const pose = await net.estimateSinglePose(video);
-      // console.log(pose);
-      //console.log(isFacingCamera(pose.keypoints));
-      console.log(isSittingDown(pose.keypoints));
-      drawCanvas(pose, videoWidth, videoHeight);
-    }
-  };
+    webcamRef.current.video.width = videoWidth;
+    webcamRef.current.video.height = videoHeight;
 
-  const drawCanvas = (pose, videoWidth, videoHeight) => {
-    const canvas = canvasRef.current;
+    const pose = await net.estimateSinglePose(video);
+    setLandMarks(pose.keypoints ? pose.keypoints : []);
+    // console.log(pose);
+    //console.log(isFacingCamera(pose.keypoints));
+    // console.log(isSittingDown(pose.keypoints));
+    // console.log(capture);
+    // if(captuer)
+    //   console.log(distanceToScreen(captuer, landmarks))
+    drawCanvas(pose, videoWidth, videoHeight);
+  }
+};
 
-    // Check if canvas reference and context are available before accessing them
-    if (canvas && canvas.getContext) {
-      const ctx = canvas.getContext('2d');
-  
-      // Check if the context is available before using it
-      if (ctx) {
-        canvas.width = videoWidth;
-        canvas.height = videoHeight;
-  
-        drawKeypoints(pose['keypoints'], 0.5, ctx);
-        drawSkeleton(pose['keypoints'], 0.5, ctx);
-      } else {
-        console.error('Canvas context not available.');
-      }
+const drawCanvas = (pose, videoWidth, videoHeight) => {
+  const canvas = canvasRef.current;
+
+  // Check if canvas reference and context are available before accessing them
+  if (canvas && canvas.getContext) {
+    const ctx = canvas.getContext('2d');
+
+    // Check if the context is available before using it
+    if (ctx) {
+      canvas.width = videoWidth;
+      canvas.height = videoHeight;
+
+      drawKeypoints(pose['keypoints'], 0.5, ctx);
+      drawSkeleton(pose['keypoints'], 0.5, ctx);
     } else {
-      console.error('Canvas reference not available.');
+      console.error('Canvas context not available.');
     }
-  };
+  } else {
+    console.error('Canvas reference not available.');
+  }
+};
 
-  useEffect(() => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          const video = videoRef.current;
-          if (video) {
-            video.srcObject = stream;
-            video.play();
-          }
-        })
-        .catch((err) => {
-          console.error('Error accessing the camera:', err);
-        });
-    }
-    runPosenet();
-  }, []);
+useEffect(() => {
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
+        const video = videoRef.current;
+        if (video) {
+          video.srcObject = stream;
+          video.play();
+        }
+      })
+      .catch((err) => {
+        console.error('Error accessing the camera:', err);
+      });
+  }
+  runPosenet();
+}, []);
 
-  return (
-    <div className='p-4 h-screen bg-zinc-900 flex'>
-      <div className=''>
-        <p className='ml-40 border mb-4 bg-yellow-700 p-4'>
-          Step 1: Set your work time and break time
-        </p>
-        <p className='ml-40 border mb-4 bg-yellow-700 p-4'>
-          Step 2: Turn on your camera to begin your work session
-        </p>
+useEffect(() => {
+  if (landmarks[0]) {
+    console.log(distanceToScreen(capture, landmarks));
+    if (distanceToScreen(capture, landmarks))
+      setTextForBot("You Are Doing Well!")
+    else
+      setTextForBot("Don't Go Too Close");
+  }
+}, [landmarks])
+
+
+return (
+  <div className='p-4 h-screen bg-zinc-900 flex'>
+    <div className=''>
+      <p className='ml-40 border mb-4 bg-yellow-700 p-4'>
+        Step 1: Set your work time and break time
+      </p>
+      <p className='ml-40 border mb-4 bg-yellow-700 p-4'>
+        Step 2: Turn on your camera to begin your work session
+      </p>
+    </div>
+    <div className='flex flex-col ml-auto space-y-4'>
+      {/*off button*/}
+      <button
+        className={`my-2 px-4 py-2 bg-blue-500 text-white rounded-md ${isClicked ? 'bg-red-700' : 'bg-green-500'
+          }`}
+        onClick={handleClick}
+      >
+        {isClicked ? 'Off' : 'On'}
+      </button>
+
+
+      {/*timer*/}
+      <input
+        type="number"
+        placeholder="Enter time in seconds"
+        value={timeInput}
+        onChange={(e) => setTimeInput(e.target.value)}
+        className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'
+      />
+      <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md' onClick={handleCapture}>Capture</button>
+      {/* <button className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md' onClick={handleClick}>
+        Start Timer
+      </button> */}
+      <div className='mt-auto'>
+        {timerRunning ? (
+          <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
+            Time left: {timeLeft} seconds
+          </div>
+        ) : (
+          <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
+            {timeLeft === 0 ? ('Set your work time') : "Set your work time"}
+          </div>
+        )}
       </div>
-      <div className='flex flex-col ml-auto space-y-4'>
-        {/*off button*/}
-        <button
-          className={`my-2 px-4 py-2 bg-blue-500 text-white rounded-md ${isClicked ? 'bg-red-700' : 'bg-green-500'
-            }`}
-          onClick={handleClick}
-        >
-          {isClicked ? 'Off' : 'On'}
-        </button>
-
-        {/*timer*/}
-        <input
-          type="number"
-          placeholder="Enter time in seconds"
-          value={timeInput}
-          onChange={(e) => setTimeInput(e.target.value)}
-          className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'
-        />
-        <div className='mt-auto'>
-      {timerRunning ? (
-        <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
-          Time left: {timeLeft} seconds
-        </div>
-      ) : (
-        <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
-          {timeLeft === 0 ?( 'Set your work time') : "Set your work time"}
-        </div>
-      )}
-      </div>
-        <input
-          type="number"
-          placeholder="Enter time in seconds"
-          value={timeInputBreak}
-          onChange={(e) => setTimeInputBreak(e.target.value)}
-          className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'
-        />
-        <div className='mt-auto'>
+      <input
+        type="number"
+        placeholder="Enter time in seconds"
+        value={timeInputBreak}
+        onChange={(e) => setTimeInputBreak(e.target.value)}
+        className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'
+      />
+      <div className='mt-auto'>
         {timerRunningBreak ? (
           <div className='my-2 px-4 py-2 bg-yellow-600 text-white rounded-md'>
             Time left: {timeLeftBreak} seconds
@@ -292,44 +325,44 @@ const Home = () => {
           </div>
         )}
       </div>
-      </div>
-      {isClicked ? (
-        <div className="App">
-          <header className="App-header">
-          <Webcam
-              ref={webcamRef}
-              style={{
-                position: 'absolute',
-                left: 80, // Align to the left
-                top: '65%', // Center vertically
-                transform: 'translateY(-50%)', // Center vertically
-                zIndex: 9,
-                width: 640,
-                height: 480,
-              }}
-            />
-            <canvas
-              ref={canvasRef}
-              style={{
-                position: 'absolute',
-                left: 80, // Align to the left
-                top: '65%', // Center vertically
-                transform: 'translateY(-50%)', // Center vertically
-                zIndex: 9,
-                width: 640,
-                height: 480,
-              }}
-            />
-          </header>
-        </div>
-      ) : (
-        <div>
-        
-        </div>
-      )}
-      <RobotImage typedText={textForBot}/>
     </div>
-  );
-};
+    {isClicked ? (
+      <div className="App">
+        <header className="App-header">
+          <Webcam
+            ref={webcamRef}
+            style={{
+              position: 'absolute',
+              left: 80, // Align to the left
+              top: '65%', // Center vertically
+              transform: 'translateY(-50%)', // Center vertically
+              zIndex: 9,
+              width: 640,
+              height: 480,
+            }}
+          />
+          <canvas
+            ref={canvasRef}
+            style={{
+              position: 'absolute',
+              left: 80, // Align to the left
+              top: '65%', // Center vertically
+              transform: 'translateY(-50%)', // Center vertically
+              zIndex: 9,
+              width: 640,
+              height: 480,
+            }}
+          />
+        </header>
+      </div>
+    ) : (
+      <div>
+
+      </div>
+    )}
+    <RobotImage typedText={textForBot} />
+  </div>
+);
+    }
 
 export default Home;
