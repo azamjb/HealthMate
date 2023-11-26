@@ -31,6 +31,7 @@ function distanceToScreen(minDist, facialLandmarks) {
   }
 }
 
+
 function isSittingDown(facialLandmarks) {
 
   const leftEye = facialLandmarks.find(landmark => landmark.part === 'leftEye');
@@ -100,6 +101,28 @@ const Home = () => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
 
+  async function handleSendSMS() {
+    try {
+      const response = await fetch('/api/infobip', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: '16478916836', 
+          text: 'Your message text', 
+        }),
+      });
+
+      const data = await response.json();
+      console.log('SMS sent successfully:', data);
+      alert('SMS sent successfully!');
+    } catch (error) {
+      console.error('Failed to send SMS:', error);
+      alert('Failed to send SMS.');
+    }
+  }
+
 
   //Toggle camera on/off
   const handleClick = () => {
@@ -165,8 +188,9 @@ useEffect(() => {
     return () => clearInterval(breakCountdown);
   } else if (timeLeftBreak === 0 && timerRunningBreak) {
     alert('Time to work again!');
+    
     setTimerRunningBreak(false);
-
+    handleSendSMS()
     // Start the work timer after break time ends
     setTimeLeft(parseInt(timeInput));
     setTimerRunning(false);
