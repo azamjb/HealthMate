@@ -88,6 +88,9 @@ function isFacingCamera(facialLandmarks) {
 // // },[])
 
 const Home = () => {
+  useEffect(()=>{
+    document.title="Health Mate"
+  })
   const [isClicked, setIsClicked] = useState(false);
   const [timeInput, setTimeInput] = useState('');
   const [timeLeft, setTimeLeft] = useState(0);
