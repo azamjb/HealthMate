@@ -8,7 +8,7 @@ Wellness Wally is your comprehensive digital health assistant aimed at improving
 
 ## Posture Correction and Awareness 🪑
 
-Wellness Wally uses advanced AI posture detection to alert you when your posture needs adjustment. By monitoring your sitting habits, it helps you maintain a healthier posture throughout your workday, reducing strain and potential discomfort.
+Wellness Wally uses computer vision to alert you when your posture needs adjustment. By monitoring your sitting habits, it helps you maintain a healthier posture throughout your workday, reducing strain and potential discomfort.
 
 ## Screen Time Management ⏰
 
@@ -20,7 +20,7 @@ Wellness Wally advises you to maintain a safe distance from your screen. Through
 
 ## How it's Built 🛠️
 
-Wellness Wally is built using cutting-edge technologies such as advanced AI posture detection, face detection algorithms, and innovative screen time management methods. It utilizes React, JavaScript, CSS, and HTML for the front-end and integrates various AI technologies for accurate monitoring and detection.
+Wellness Wally is built using cutting-edge technologies such as advanced AI posture detection, face detection algorithms, and innovative screen time management methods. It utilizes React, JavaScript, CSS, and HTML for the front-end, and tensorflow for the backend computer vision model.
 
 ## Challenges Overcome ⚠️
 
@@ -28,7 +28,7 @@ The primary challenge faced was effectively integrating AI algorithms into the f
 
 ## Achievements 🏆
 
-We're proud to have developed an intelligent assistant focused on digital health, incorporating AI to promote better posture, manage screen time, and ensure safe viewing distances. Wellness Wally aims to enhance user well-being during work hours.
+We're proud to have intergrated computer vision in an application, and utilised tensor flow to create a helpful tool that can have a positive impact on people's digital health
 
 ## What's Next for Wellness Wally ➡️❓
 
